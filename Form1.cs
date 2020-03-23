@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,6 +77,7 @@ namespace CynosureScraper
             leOutputFile.Text = sfd.FileName;
         }
 
+        [Obsolete]
         private async void btnStart_Click(object sender, EventArgs e)
         {
             List<int> treatmentIds = new List<int>();
@@ -116,6 +118,10 @@ namespace CynosureScraper
 
             string country = rbCountryUSA.Checked ? "US" : "CA";
 
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.DefaultConnectionLimit = 9999;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12;
+
             await Task.Run(() =>
             {
                 mItemCount = 0;
@@ -132,7 +138,7 @@ namespace CynosureScraper
                         leProcess.Text = "Zip Code: " + zipcode;
                     }), null);
 
-                    engine.Process(zipcode, country, 0, treatmentIds.ToArray(), filePath, onNewItemAdded);
+                    engine.Process(zipcode, country, 300, treatmentIds.ToArray(), filePath, onNewItemAdded);
                 }
             });
 
